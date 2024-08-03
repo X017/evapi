@@ -34,6 +34,7 @@ def postMusic():
     music_length = metadata['streaminfo']['duration'] 
     music_duration = time.strftime('%M:%S', time.gmtime(music_length))
     # added a comment
+    # added a second comment
     return {
             "duration":music_duration,
             "music":jsonData['music']

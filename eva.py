@@ -20,14 +20,21 @@ def stop():
 
 @post('/')
 def postMusic():
+    state = ''
     #incoming raw data
     rawData = request.body.readlines()
     #turn raw data into json data
     jsonData = json.loads(rawData[0].decode('utf-8')) 
-    
-    #play music 
-    play(jsonData['music'])
-    
+    #play music
+
+    if jsonData['command'] == 'play':
+        state = 'playing'
+        play(jsonData['music'])
+    elif jsonData['command'] == 'stop':
+        state = 'stopped'
+        stop()
+
+
     #declaring global variables for metadatas 
     global music_duration , metadata
     metadata = ad.load(directory+jsonData['music']) # loading music metadata for api 
@@ -36,7 +43,8 @@ def postMusic():
   
     return {
             "duration":music_duration,
-            "music":jsonData['music']
+            "music":jsonData['music'],
+            "state":state
             }
 
 

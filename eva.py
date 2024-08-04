@@ -8,11 +8,20 @@ import time
 
 mixer.init()
 directory = 'music/'
+sqldir = sqlite3.connect("database.db")
 
-    
 def play(musicString : str):
     mixer.music.load(directory+musicString)
     mixer.music.play()
+
+
+def dbInterface(): # TEST FUNCTION 
+    for file,file_id in enumerate(os.listdir('music')):
+        query = 'INSERT INTO music(music_name, music_id) VALUES("{0}","{1}")'.format(file,file_id)
+        print(query)
+   #sql = sqldir.cursor()
+   #sql.execute(query)
+   #sqldir.commit()
 
 
 def stop():
@@ -47,6 +56,8 @@ def postMusic():
             "state":state
             }
 
-
+@route('/plist')
+def playListFunction():
+    dbInterface()
 run(host='127.0.0.1',port=8000,reloader=True)
 

@@ -23,6 +23,8 @@ def dbInterface(command:str):
              sql.execute(query)
     elif command == 'show_playlist':
         pass
+    elif commnad == 'append_playlist':
+        pass
     
     sqldir.commit()
 
@@ -59,9 +61,9 @@ def postMusic():
             "state":state
             }
 
-@route('/plist')
+@route('/update_list')
 def playListFunction():
-    dbInterface()
+    dbInterface('update_playlist')
 
 run(host='127.0.0.1',port=8000,reloader=True)
 

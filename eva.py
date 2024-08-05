@@ -15,14 +15,30 @@ def play(musicString : str):
     mixer.music.play()
 
 
+
+
 def dbInterface(command:str):
     if command == 'update_playlist':
-         for file,file_id in enumerate(os.listdir('music')):
-             query = 'INSERT INTO music(music_name, music_id) VALUES("{0}","{1}")'.format(file_id,file)
-             sql = sqldir.cursor()
-             sql.execute(query)
+        query = 'SELECT * FROM music'
+        sql = sqldir.cursor()
+        sql.execute(query)
+        data = sql.fetchall()
+        for file,file_id in enumerate(os.listdir('music')): # IDK what im doing but im doing fine
+            #this block of code here stops data duplicate whenever you refresh ("/update_list")
+            if file in data:
+                pass
+            else:
+                query = 'INSERT INTO music(music_name, music_id) VALUES("{0}","{1}")'.format(file_id,file)
+                sql.execute(query)
+        sqldir.commit()
+    
     elif command == 'show_playlist':
-        pass
+        sql = sqldir.cursor()
+        query = 'SELECT DISTINCT  * FROM music'
+        sql.execute(query)
+        musicTable = sql.fetchall()
+        return musicTable
+
     elif commnad == 'append_playlist':
         pass
     
@@ -36,9 +52,7 @@ def stop():
 def postMusic():
     state = ''
     #incoming raw data
-    rawData = request.body.readlines()
-    #turn raw data into json data
-    jsonData = json.loads(rawData[0].decode('utf-8')) 
+    rawData = request.body.readlines() #turn raw data into json data jsonData = json.loads(rawData[0].decode('utf-8')) 
     #play music
 
     if jsonData['command'] == 'play':
@@ -61,9 +75,16 @@ def postMusic():
             "state":state
             }
 
+@route('/list')
+def musiclistReturn():
+    list_data = dbInterface("show_playlist")
+    return template('music_list.tpl',list_data = list_data)
+
 @route('/update_list')
 def playListFunction():
     dbInterface('update_playlist')
 
-run(host='127.0.0.1',port=8000,reloader=True)
+
+
+run(host='0.0.0.0',port=8000,reloader=True)
 

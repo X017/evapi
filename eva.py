@@ -52,9 +52,9 @@ def stop():
 def postMusic():
     state = ''
     #incoming raw data
-    rawData = request.body.readlines() #turn raw data into json data jsonData = json.loads(rawData[0].decode('utf-8')) 
-    #play music
-
+    rawData = request.body.readlines() #turn raw data into json data 
+    jsonData = json.loads(rawData[0].decode('utf-8')) 
+    print(jsonData)
     if jsonData['command'] == 'play':
         state = 'playing'
         play(jsonData['music'])

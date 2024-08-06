@@ -84,7 +84,10 @@ def musiclistReturn():
 def playListFunction():
     dbInterface('update_playlist')
 
-
+@post('/list_get')
+def listGetAPI():
+    data = dbInterface("show_playlist")
+    return {"music_list":data}
 
 run(host='0.0.0.0',port=8000,reloader=True)
 

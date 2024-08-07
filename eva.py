@@ -48,6 +48,11 @@ def dbInterface(command:str):
 def stop():
     mixer.music.stop()
 
+
+
+def pause():
+    mixer.music.pause()
+
 @post('/')
 def postMusic():
     state = ''
@@ -57,11 +62,16 @@ def postMusic():
     print(jsonData)
     if jsonData['command'] == 'play':
         state = 'playing'
-        play(jsonData['music'])
+        play(jsonData['music']) 
     elif jsonData['command'] == 'stop':
         state = 'stopped'
         stop()
-
+    elif jsonData['command'] == 'pause':
+        state = 'paused'
+        pause()
+    elif jsonData['command'] == 'resume':
+        state = 'playing'
+        mixer.music.unpause()
 
     #declaring global variables for metadatas 
     global music_duration , metadata
@@ -80,7 +90,7 @@ def musiclistReturn():
     list_data = dbInterface("show_playlist")
     return template('music_list.tpl',list_data = list_data)
 
-@route('/update_list')
+@post('/update_list')
 def playListFunction():
     dbInterface('update_playlist')
 

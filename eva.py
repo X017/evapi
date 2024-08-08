@@ -9,10 +9,11 @@ import time
 mixer.init()
 directory = 'music/'
 sqldir = sqlite3.connect("database.db")
+mix = mixer.music
 
 def play(musicString : str):
-    mixer.music.load(directory+musicString)
-    mixer.music.play()
+    mix.load(directory+musicString)
+    mix.play()
 
 
 
@@ -46,12 +47,14 @@ def dbInterface(command:str):
 
 
 def stop():
-    mixer.music.stop()
-
+    mix.stop()
 
 
 def pause():
-    mixer.music.pause()
+    mix.pause()
+
+def seek(pos2):
+    mix.play(0,pos2)
 
 @post('/')
 def postMusic():
@@ -72,13 +75,23 @@ def postMusic():
     elif jsonData['command'] == 'resume':
         state = 'playing'
         mixer.music.unpause()
-
+    elif jsonData['command'] == 'seek':
+        state = 'playing'
+        seek(30)
     #declaring global variables for metadatas 
     global music_duration , metadata
     metadata = ad.load(directory+jsonData['music']) # loading music metadata for api 
     music_length = metadata['streaminfo']['duration'] 
     music_duration = time.strftime('%M:%S', time.gmtime(music_length))
-  
+    def convert(sec): #HEHE I LOVE STEALING CODE FROM THE INTERNET 
+        #OH I MEANT GETTING INSPIRED BY THE INTERNET :D
+        sec = sec % (24 * 3600)
+        sec %= 3600
+        min = sec // 60
+        sec %= 60
+        return "%02d:%02d" % (min, sec) 
+
+
     return {
             "duration":music_duration,
             "music":jsonData['music'],

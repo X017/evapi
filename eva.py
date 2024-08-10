@@ -10,11 +10,9 @@ mixer.init()
 directory = 'music/'
 sqldir = sqlite3.connect("database.db")
 mix = mixer.music
-
 def play(musicString : str):
     mix.load(directory+musicString)
     mix.play()
-
 
 
 
@@ -56,13 +54,17 @@ def pause():
 def seek(pos2):
     mix.play(0,pos2)
 
+state = ''
 @post('/')
 def postMusic():
-    state = ''
     #incoming raw data
-    rawData = request.body.readlines() #turn raw data into json data 
-    jsonData = json.loads(rawData[0].decode('utf-8')) 
-    print(jsonData)
+    global state
+    try:
+      rawData = request.body.readlines() #turn raw data into json data 
+      jsonData = json.loads(rawData[0].decode('utf-8')) 
+      print(jsonData)
+    except IndexError:
+        return {"ERROR":"404!"}
     if jsonData['command'] == 'play':
         state = 'playing'
         play(jsonData['music']) 
@@ -78,7 +80,9 @@ def postMusic():
     elif jsonData['command'] == 'seek':
         state = 'playing'
         seek(30)
-    #declaring global variables for metadatas 
+    if jsonData['command'] == 'info':
+        print(state,234)
+        #declaring global variables for metadatas 
     global music_duration , metadata
     metadata = ad.load(directory+jsonData['music']) # loading music metadata for api 
     music_length = metadata['streaminfo']['duration'] 
@@ -90,13 +94,13 @@ def postMusic():
         min = sec // 60
         sec %= 60
         return "%02d:%02d" % (min, sec) 
-
-
     return {
-            "duration":music_duration,
-            "music":jsonData['music'],
-            "state":state
+                "duration":music_duration,
+                "music":jsonData['music'],
+                "state":state,
+                "song_position":convert(mix.get_pos()/1000)
             }
+
 
 @route('/list')
 def musiclistReturn():
